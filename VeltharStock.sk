@@ -1,0 +1,250 @@
+# ======================================================
+# STOCK SİSTEMİ - VELTHAR WİLDS TARAAFINDAN
+# ======================================================
+
+options:
+    p: &8[&aStock&8] &f
+    refresh: 7200
+    bos_slot_adi: &c&lBOŞ SLOT
+    gift_sound: entity.experience_orb.pickup 
+
+# --- [1. FONKSİYONLAR] ---
+
+function updateClock(p: player):
+    set {_sec} to {s::time}
+    set {_h} to floor({_sec}/3600)
+    set {_m} to floor((({_sec} mod 3600)/60))
+    set {_s} to {_sec} mod 60
+    set slot 4 of {_p}'s current inventory to clock named "&6Yenilenme" with lore "&e%{_h}%:%{_m}%:%{_s}%"
+
+function refreshStock():
+    set {s::time} to {@refresh}
+    loop 10 times:
+        set {_pg} to loop-number
+        loop 8 times:
+            set {_idx} to loop-number-2
+            if {s::p%{_pg}%::slot::%{_idx}%::item} is set:
+                set {_n} to {s::p%{_pg}%::slot::%{_idx}%::nadirlik}
+                set {_min} to {s::p%{_pg}%::slot::%{_idx}%::minstock}
+                set {_max} to {s::p%{_pg}%::slot::%{_idx}%::maxstock}
+                set {_rnd} to random integer between 1 and 100
+                if {_n} is 20:
+                    if {_rnd} <= 10:
+                        set {s::p%{_pg}%::slot::%{_idx}%::stock} to random integer between {_min} and (floor({_min} + ({_max}-{_min})*0.2))
+                    else:
+                        set {s::p%{_pg}%::slot::%{_idx}%::stock} to 0
+                else if {_n} >= 13:
+                    if {_rnd} <= 60:
+                        set {s::p%{_pg}%::slot::%{_idx}%::stock} to random integer between {_min} and (floor({_min} + ({_max}-{_min})*0.7))
+                    else:
+                        set {s::p%{_pg}%::slot::%{_idx}%::stock} to 0
+                else:
+                    set {s::p%{_pg}%::slot::%{_idx}%::stock} to random integer between {_min} and {_max}
+    broadcast "{@p}&eStoklar başarıyla tazelendi!"
+
+function openConfirm(p: player, type: text, target: player, page: number, idx: number):
+    set {_i} to {s::p%{_page}%::slot::%{_idx}%::item}
+    set {_pr} to {s::p%{_page}%::slot::%{_idx}%::price}
+    set {_gui} to chest inventory with 6 rows named "&0Onay: %{_type}%"
+    loop 54 times:
+        set slot (loop-number - 1) of {_gui} to gray stained glass pane named " "
+    set slot 13 of {_gui} to {_i}
+    set slot 0 of {_gui} to skull of {_target} named "&6Alıcı: &f%{_target}%"
+    set {_cam} to blue stained glass pane named "&bSatın Alım"
+    if {_type} contains "Hediye":
+        set {_cam} to yellow stained glass pane named "&eHediye Etme"
+    set slot 11, 12, 14 and 15 of {_gui} to {_cam}
+    set slot 29, 30, 38 and 39 of {_gui} to lime stained glass pane named "&a&lONAYLA" with lore "&7Ücret: &e%{_pr}% GEM"
+    set slot 32, 33, 41 and 42 of {_gui} to red stained glass pane named "&c&lİPTAL"
+    set {temp::%{_p}%} to "%{_type}%|%{_target}%|%{_page}%|%{_idx}%"
+    open {_gui} to {_p}
+
+# --- [2. ANA MARKET] ---
+
+command /stock [<number>]:
+    trigger:
+        set {_p} to arg 1 if arg 1 is set else 1
+        set {_gui} to chest inventory with 6 rows named "&0Stock - Sayfa: %{_p}%"
+        loop 54 times:
+            set slot (loop-number - 1) of {_gui} to gray stained glass pane named " "
+        
+        set slot 13, 22, 31 and 40 of {_gui} to nether star named "&b&l★"
+        
+        # PROFİL (48) - Internal Error Çözümü
+        set {_rutbe} to (placeholder "luckperms_primary_group_name" from player)
+        set {_rutbe} to "Oyuncu" if {_rutbe} is not set
+        set slot 48 of {_gui} to player's skull named "&e&lPROFİL" with lore "&7İsim: &f%player%" and "&7Rütbe: &a%{_rutbe}%"
+
+        # CÜZDAN (49) - Glow Yazısı Gizleme
+        set {_bal} to (placeholder "vec_balance" from player)
+        set {_bal} to "0" if {_bal} is not set
+        set {_cuzdan} to paper named "&d&lCÜZDAN" with lore "&7Bakiyen: &e%{_bal}% GEM"
+        enchant {_cuzdan} with luck of the sea 1
+        set item flags of {_cuzdan} to hide enchantments
+        set slot 49 of {_gui} to {_cuzdan}
+
+        # REHBER (50) - Liste Hatası Çözümü (Tek tek ekleme)
+        set {_bilgi} to book named "&6&lBİLGİ REHBERİ"
+        clear {_lore::*}
+        add "&7&m-----------------------" to {_lore::*}
+        add "&e• &fStoklar her &62 saatte &fbir yenilenir." to {_lore::*}
+        add "&e• &fNadirlik arttıkça stok gelme şansı düşer." to {_lore::*}
+        add "&e• &fNadirlik Tablosu:" to {_lore::*}
+        add "  &8- &fSıradan: &a%%100" to {_lore::*}
+        add "  &8- &fEfsanevi: &e%%60" to {_lore::*}
+        add "  &8- &fTanrısal: &c%%10" to {_lore::*}
+        add "&7&m-----------------------" to {_lore::*}
+        set lore of {_bilgi} to {_lore::*}
+        set slot 50 of {_gui} to {_bilgi}
+        
+        set slot 45 of {_gui} to spectral arrow named "&a← Önceki" if {_p} > 1
+        set slot 53 of {_gui} to spectral arrow named "&aSonraki →"
+        
+        set {_slots::*} to 10, 19, 28, 37, 14, 23, 32 and 41
+        loop 8 times:
+            set {_i} to loop-number
+            set {_sl} to {_slots::%{_i}%}
+            if {s::p%{_p}%::slot::%{_i}%::item} is set:
+                set {_stok} to {s::p%{_p}%::slot::%{_i}%::stock}
+                set {_stok} to 0 if {_stok} is not set
+                set {_n_val} to {s::p%{_p}%::slot::%{_i}%::nadirlik}
+                
+                # Nadirlik 20 ve Metinler (Hata veren if-else yapısı düzeltildi)
+                set {_n_txt} to "&bNadir"
+                if {_n_val} is 20:
+                    set {_n_txt} to "&4&l&ka&c&l TANRISAL &4&l&ka"
+                else if {_n_val} >= 13:
+                    set {_n_txt} to "&4Efsanevi"
+
+                set {_item_lore::*} to lore of {s::p%{_p}%::slot::%{_i}%::item}
+                add "&7Nadirlik: %{_n_txt}%" to {_item_lore::*} # Tükenince de görünür
+                
+                if {_stok} > 0:
+                    add "&7Fiyat: &d%{s::p%{_p}%::slot::%{_i}%::price}% GEM" to {_item_lore::*}
+                    add "&7Stok: &e%{_stok}%" to {_item_lore::*}
+                    set slot {_sl} of {_gui} to {s::p%{_p}%::slot::%{_i}%::item} with lore {_item_lore::*}
+                    set slot ({_sl} + 1) of {_gui} to lime stained glass pane named "&aSatın Al" with lore "&7Sıra: %{_i}%"
+                    set slot ({_sl} + 2) of {_gui} to yellow stained glass pane named "&eHediye Et" with lore "&7Sıra: %{_i}%"
+                else:
+                    add "&4&l&mStok Tükendi" to {_item_lore::*} 
+                    set slot {_sl} of {_gui} to {s::p%{_p}%::slot::%{_i}%::item} with lore {_item_lore::*}
+                    set slot ({_sl} + 1) of {_gui} to red stained glass pane named "&c&l&mStok Tükendi"
+                    set slot ({_sl} + 2) of {_gui} to red stained glass pane named "&c&l&mStok Tükendi"
+            else:
+                set slot {_sl} of {_gui} to barrier named "{@bos_slot_adi}" # Boş slot yazısı
+        open {_gui} to player
+        updateClock(player)
+
+# --- [3. ADMİN & SİSTEM] ---
+
+command /stockadmin [<text>] [<number>] [<number>]:
+    permission: op
+    trigger:
+        if arg 1 is not set:
+            send "&8&m-------&r {@p} &eAdmin Paneli &8&m-------"
+            send "&6/stockadmin yenile &8- &7Stokları tazeler."
+            send "&6/stockadmin sil <sayfa> <sıra> &8- &7Ürünü siler."
+            send "&6/itemekle ... &8- &7Ekleme rehberi."
+            send "&8&m----------------------------"
+            stop
+        if arg 1 is "yenile":
+            refreshStock()
+        if arg 1 is "sil":
+            delete {s::p%arg 2%::slot::%arg 3%::item}
+            send "{@p}&eSayfa %arg 2% Sıra %arg 3% &7silindi."
+
+command /itemekle [<number>] [<number>] [<number>] [<number>] [<number>] [<number>]:
+    permission: op
+    trigger:
+        if player's tool is air:
+            send "{@p}&cElinizde eşya yok!"
+            stop
+        if arg 6 is not set:
+            send "{@p}&eKullanım: /itemekle <Sıra(1-8)> <Sayfa> <Fiyat> <MinStok> <MaxStok> <Nadirlik(1-20)>"
+            stop
+        set {s::p%arg 2%::slot::%arg 1%::item} to player's tool
+        set {s::p%arg 2%::slot::%arg 1%::price} to arg 3
+        set {s::p%arg 2%::slot::%arg 1%::minstock} to arg 4
+        set {s::p%arg 2%::slot::%arg 1%::maxstock} to arg 5
+        set {s::p%arg 2%::slot::%arg 1%::stock} to arg 4
+        set {s::p%arg 2%::slot::%arg 1%::nadirlik} to arg 6
+        send "{@p}&aEşya başarıyla eklendi!"
+
+on inventory click:
+    set {_t} to uncolored name of event-inventory
+    if {_t} contains "Stock - Sayfa:":
+        cancel event
+        set {_title} to {_t}
+        replace "Stock - Sayfa: " with "" in {_title}
+        set {_curr} to {_title} parsed as number
+        if name of event-slot contains "Sonraki":
+            execute player command "stock %{_curr} + 1%"
+        else if name of event-slot contains "Önceki":
+            execute player command "stock %{_curr} - 1%"
+        else if name of event-slot is "&aSatın Al":
+            set {_id_raw} to uncolored line 1 of lore of event-slot
+            replace "Sıra: " with "" in {_id_raw}
+            openConfirm(player, "Satın Al", player, {_curr}, ({_id_raw} parsed as number))
+        else if name of event-slot is "&eHediye Et":
+            set {_id_raw} to uncolored line 1 of lore of event-slot
+            replace "Sıra: " with "" in {_id_raw}
+            set {gift::wait::%player%} to "%{_curr}%|%{_id_raw}%"
+            close player's inventory
+            send "{@p}&eHediye edilecek oyuncuyu sohbetten yazın."
+
+    else if {_t} contains "Onay:":
+        cancel event
+        set {_d::*} to {temp::%player%} split at "|"
+        if name of event-slot is "&a&lONAYLA":
+            set {_pg} to {_d::3} parsed as number
+            set {_idx} to {_d::4} parsed as number
+            if {s::p%{_pg}%::slot::%{_idx}%::stock} <= 0:
+                send "{@p}&cBu ürün tükendi!"
+                close player's inventory
+                stop
+            set {_price} to {s::p%{_pg}%::slot::%{_idx}%::price}
+            set {_bal} to (placeholder "vec_balance" from player) parsed as number
+            if {_bal} >= {_price}:
+                set {_target_obj} to {_d::2} parsed as player
+                set {_item} to {s::p%{_pg}%::slot::%{_idx}%::item}
+                if {_target_obj} has enough space for {_item}:
+                    execute console command "vec remove %player% %{_price}%"
+                    remove 1 from {s::p%{_pg}%::slot::%{_idx}%::stock}
+                    give {_item} to {_target_obj}
+                    play sound "{@gift_sound}" to {_target_obj}
+                    set {_i_disp} to (name of {_item} if name of {_item} is set else "%type of {_item}%")
+                    if {_target_obj} is not player:
+                        send "{@p}&e%player% &7sana hediye gönderdi: &f%{_i_disp}%" to {_target_obj}
+                        send "{@p}&e%{_target_obj}% &7kişisine hediye gönderildi." to player
+                    else:
+                        send "{@p}&aEşya satın alındı!" to player
+                    delete {temp::%player%}
+                    execute player command "stock %{_pg}%"
+                else:
+                    send "{@p}&cAlıcının envanteri dolu!"
+            else:
+                send "{@p}&cYetersiz bakiye!"
+        else if name of event-slot is "&c&lİPTAL":
+            delete {temp::%player%}
+            execute player command "stock %{_d::3}%"
+
+on chat:
+    if {gift::wait::%player%} is set:
+        cancel event
+        set {_target} to message parsed as player
+        set {_data::*} to {gift::wait::%player%} split at "|"
+        delete {gift::wait::%player%}
+        if {_target} is online:
+            openConfirm(player, "Hediye Et", {_target}, ({_data::1} parsed as number), ({_data::2} parsed as number))
+        else:
+            send "{@p}&cOyuncu bulunamadı!"
+            execute player command "stock %{_data::1}%"
+
+every 1 second:
+    if {s::time} is not set:
+        set {s::time} to {@refresh}
+    remove 1 from {s::time}
+    refreshStock() if {s::time} <= 0
+    loop all players:
+        if uncolored name of loop-player's current inventory contains "Stock - Sayfa:":
+            updateClock(loop-player)

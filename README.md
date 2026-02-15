@@ -248,6 +248,4 @@ Herhangi bir sorun, öneri veya özelleştirme talebi için:
 
 Güncellemeler için skript dosyasını düzenli olarak kontrol edin.
 
-================================================================================
                            İYİ OYUNLAR DİLERİZ!
-================================================================================

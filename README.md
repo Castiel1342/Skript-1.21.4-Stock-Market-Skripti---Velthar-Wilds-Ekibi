@@ -1,8 +1,6 @@
-================================================================================
+
                     STOCK SİSTEMİ - KULLANIM KILAVUZU
                       Geliştirici: Velthar Wilds
-================================================================================
-
 İÇİNDEKİLER:
 1. Sistem Hakkında
 2. Özellikler
@@ -15,9 +13,7 @@
 9. Stok Yenileme Mekanizması
 10. Sorun Giderme
 
-================================================================================
 1. SİSTEM HAKKINDA
-================================================================================
 
 Bu skript, Minecraft sunucunuz için gelişmiş bir market/mağaza sistemidir.
 Otomatik stok yenileme, nadirlik sistemi, hediye gönderme ve sayfalama
@@ -28,9 +24,7 @@ Gereksinimler:
 - LuckPerms (rütbe gösterimi için)
 - VEC ekonomi sistemi (veya uyumlu ekonomi eklentisi)
 
-================================================================================
 2. ÖZELLİKLER
-================================================================================
 
 ✓ Otomatik Stok Yenileme (Varsayılan: 2 saatte bir)
 ✓ 10 Sayfa Destek (Her sayfada 8 ürün slotu)
@@ -42,18 +36,14 @@ Gereksinimler:
 ✓ Onay Menüsü (Yanlış alım önleme)
 ✓ Özelleştirilebilir Ses Efektleri
 
-================================================================================
 3. KURULUM
-================================================================================
 
 1. Skripti sunucunuzun /plugins/Skript/scripts/ klasörüne koyun
 2. Skripti yüklemek için /sk reload <dosya_adi> komutunu kullanın
 3. İlk stok yenileme otomatik olarak başlayacaktır
 4. Ürün eklemek için admin komutlarını kullanın
 
-================================================================================
 4. OYUNCU KOMUTLARI
-================================================================================
 
 /stock [sayfa_numarası]
 ├─ Açıklama: Market menüsünü açar
@@ -81,9 +71,7 @@ Hediye Gönderme:
 3. Onay menüsünde "ONAYLA" butonuna basın
 4. Ürün hedef oyuncuya gönderilir
 
-================================================================================
 5. ADMİN KOMUTLARI
-================================================================================
 
 /stockadmin
 ├─ İzin: op
@@ -110,9 +98,7 @@ Hediye Gönderme:
     ├─ maxStok: Maximum stok miktarı
     └─ nadirlik: 1-20 arası nadirlik değeri
 
-================================================================================
 6. SİSTEM AYARLARI
-================================================================================
 
 Skript dosyasının başındaki "options:" bölümünden ayarlanabilir:
 
@@ -132,9 +118,7 @@ gift_sound: entity.experience_orb.pickup
 ├─ Hediye alındığında çalan ses
 └─ Minecraft ses ID'si kullanılır
 
-================================================================================
 7. ÜRÜN EKLEME REHBERİ
-================================================================================
 
 ADIM ADIM ÜRÜN EKLEME:
 
@@ -165,9 +149,7 @@ ADIM ADIM ÜRÜN EKLEME:
 ├─ Stok: 1-5 arası
 └─ Nadirlik: 20 (Tanrısal)
 
-================================================================================
 8. NADİRLİK SİSTEMİ
-================================================================================
 
 Nadirlik Değerleri (1-20):
 
@@ -190,9 +172,7 @@ Stok Miktarı:
 • Efsanevi: minStok ile %70 civarı
 • Tanrısal: minStok ile %20 civarı
 
-================================================================================
 9. STOK YENİLEME MEKANİZMASI
-================================================================================
 
 Otomatik Yenileme:
 ├─ Her 2 saatte bir (7200 saniye)
@@ -208,9 +188,7 @@ Yenileme Sırasında:
 ├─ Saat sayacı sıfırlanır
 └─ Oyuncular bilgilendirilir
 
-================================================================================
 10. SORUN GİDERME
-================================================================================
 
 PROBLEM: Cüzdan bakiyesi gösterilmiyor
 ÇÖZÜM: VEC eklentisinin doğru kurulduğundan emin olun
@@ -236,9 +214,7 @@ PROBLEM: "Internal Error" hatası
 ÇÖZÜM: Skript güncel sürümü kullanın
        PlaceholderAPI ve gerekli expansion'lar yüklü olmalı
 
-================================================================================
 EK BİLGİLER
-================================================================================
 
 Veritabanı Yapısı:
 {s::p[sayfa]::slot::[sıra]::item} - Ürün objesi
@@ -262,9 +238,7 @@ Veritabanı Yapısı:
 • Yenileme süresini sunucu ekonomisine göre ayarlayın
 • Nadirlik sistemini özel değerlerle genişletebilirsiniz
 
-================================================================================
                               DESTEK VE İLETİŞİM
-================================================================================
 
 Bu skript Velthar Wilds tarafından geliştirilmiştir.
 
